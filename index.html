@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gödel - AI Formal Verification</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        
+        <!-- Hero Section -->
+        <header id="hero" class="section"></header>
+
+        <!-- About Section -->
+        <section id="about" class="section"></section>
+
+        <!-- How It Works Section -->
+        <section id="pipeline" class="section">
+            <h2>Architecture Pipeline</h2>
+            <div id="pipeline-container" class="pipeline-grid"></div>
+        </section>
+
+        <!-- Benchmarks Section -->
+        <section id="benchmarks" class="section">
+            <h2>Benchmark Results</h2>
+            <div id="benchmark-summary" class="summary-grid"></div>
+            <div class="table-container">
+                <table id="benchmark-table">
+                    <thead>
+                        <tr>
+                            <th>Contract</th>
+                            <th>LOC</th>
+                            <th>Status</th>
+                            <th>Bugs (Found/Planted)</th>
+                            <th>Missed</th>
+                            <th>False Positives</th>
+                            <th>Categories</th>
+                            <th>Summary</th>
+                        </tr>
+                    </thead>
+                    <tbody id="benchmark-tbody"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <div class="grid-2-col">
+            <!-- Current Work Section -->
+            <section id="current-work" class="section">
+                <h2>Active Development</h2>
+                <ul id="current-work-list" class="tech-list"></ul>
+            </section>
+
+            <!-- Roadmap Section -->
+            <section id="roadmap" class="section">
+                <h2>Roadmap</h2>
+                <ul id="roadmap-list" class="timeline-list"></ul>
+            </section>
+        </div>
+
+        <!-- Known Limitations Section -->
+        <section id="limitations" class="section">
+            <h2>Known Limitations</h2>
+            <div id="limitations-container"></div>
+        </section>
+
+        <!-- Footer -->
+        <footer id="footer"></footer>
+
+    </div>
+
+    <!-- Load Data, then load logic -->
+    <script src="config.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
