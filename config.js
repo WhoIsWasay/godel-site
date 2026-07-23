@@ -116,14 +116,18 @@ currentWork: [
 ],
 
     // 6. KNOWN PROBLEMS
-    knownProblems: [
-        {
-            problem: "Isolated Function Scope",
-            why_it_happens: "The Inspector-Isolator engine is rigidly constrained to analyze one isolated function at a time.It is mathematically blind to compositional, multi-transaction attack vectors.If a zero-day exploit relies on an attacker interacting with one public entrypoint (e.g., triggering a state lock) and then calling an entirely separate public entrypoint in a subsequent transaction to drain funds, the isolated pipeline will mark both functions as safe. This boundary can only be breached in a separate, compositional agent phase.",
-            planned_fix: "'None' At this stage our main focus is to find and fix atleast 95% of the Isolated bugs out there"
-        },
-       
-    ],
+ knownProblems: [
+    {
+        problem: "Isolated Function Scope",
+        why_it_happens: "The Inspector-Isolator engine is rigidly constrained to analyze one isolated function at a time. It is mathematically blind to compositional, multi-transaction attack vectors. If a zero-day exploit relies on an attacker interacting with one public entrypoint (e.g., triggering a state lock) and then calling an entirely separate public entrypoint in a subsequent transaction to drain funds, the isolated pipeline will mark both functions as safe. This boundary can only be breached in a separate, compositional agent phase.",
+        planned_fix: "'None' at this stage. Our main focus is to find and fix at least 95% of the isolated bugs out there."
+    },
+    {
+        problem: "Unverified State Reachability",
+        why_it_happens: "When the Isolator proves an invariant violation, it proves it over free variables, not over states reachable through real transaction sequences. In many cases the violating state coincides with a genuinely reachable one, particularly when shared state can be influenced through paths outside the function under analysis. But the pipeline has no general mechanism to confirm that a mathematically valid counterexample corresponds to an actual reachable state, so a reported finding's severity — or its exploitability at all — may be overstated.",
+        planned_fix: "'None' at this stage. Both this and the isolated-scope limitation stem from the same boundary: proper resolution requires modeling the full state-transition system rather than a single function body, which is deferred to a separate, compositional agent phase."
+    },
+],
 
     // 7. ROADMAP
   roadmap: [
