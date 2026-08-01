@@ -106,6 +106,18 @@ const siteConfig = {
             github_link: "https://github.com/WhoIsWasay/godel-audit-results/tree/main/globalPayrollWithholdingManager",
             short_summary: "Successfully identified an incorrect timeline denominator vesting ratio error across standalone and state-dependent execution pathways."
         },
+         {
+            contract_name: "CollateralizeDebtPosition",
+            lines_of_code: 64,
+            bugs_planted: 3,
+            bugs_found: 2,
+            bugs_missed: 1,
+            false_positives: 0,
+            status: "Partial",
+            category_tags: ["arithmetic", "logic"],
+            github_link: "https://github.com/WhoIsWasay/godel-audit-results/tree/main/collateralizeDebtPosition",
+            short_summary: "Successfully identified a floor-division fee truncation flaw, a post-mutation interest calculation evasion, a 1-wei share-burning rounding arbitrage, and verified a false-positive unchecked overflow guard"
+        },
     ],
 
     // 5. CURRENT WORK
