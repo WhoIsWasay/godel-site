@@ -51,12 +51,20 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('benchmarks').classList.add('reveal');
     
     let totalContracts = siteConfig.benchmarks.length;
-    let totalPlanted = 0;
-    let totalFound = 0;
+    let syntheticPlanted = 0;
+    let syntheticFound = 0;
+    let competitivePlanted = 0;
+    let competitiveFound = 0;
 
     siteConfig.benchmarks.forEach(bm => {
-        totalPlanted += bm.bugs_planted;
-        totalFound += bm.bugs_found;
+        const isCompetitive = bm.category_tags && bm.category_tags.includes('competitive-audit');
+        if (isCompetitive) {
+            competitivePlanted += bm.bugs_planted;
+            competitiveFound += bm.bugs_found;
+        } else {
+            syntheticPlanted += bm.bugs_planted;
+            syntheticFound += bm.bugs_found;
+        }
 
         const row = document.createElement('tr');
         const badgeClass = bm.status.toLowerCase();
@@ -75,7 +83,8 @@ document.addEventListener('DOMContentLoaded', () => {
         tableBody.appendChild(row);
     });
 
-    const hitRate = totalPlanted > 0 ? ((totalFound / totalPlanted) * 100).toFixed(1) : 0;
+    const syntheticHitRate = syntheticPlanted > 0 ? ((syntheticFound / syntheticPlanted) * 100).toFixed(1) : 0;
+    const competitiveMatchRate = competitivePlanted > 0 ? ((competitiveFound / competitivePlanted) * 100).toFixed(1) : 0;
 
     summaryGrid.innerHTML = `
         <div class="summary-card">
@@ -83,12 +92,16 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="summary-label">Contracts Tested</div>
         </div>
         <div class="summary-card">
-            <div class="summary-value">${totalPlanted}</div>
-            <div class="summary-label">Total Vulnerabilities</div>
+            <div class="summary-value" style="color: var(--color-catch)">${syntheticHitRate}%</div>
+            <div class="summary-label">Synthetic Hit Rate (${syntheticFound}/${syntheticPlanted})</div>
         </div>
         <div class="summary-card">
-            <div class="summary-value" style="color: var(--color-catch)">${hitRate}%</div>
-            <div class="summary-label">Overall Hit Rate</div>
+            <div class="summary-value" style="color: var(--color-catch)">${competitiveMatchRate}%</div>
+            <div class="summary-label">C4 Match Rate (${competitiveFound}/${competitivePlanted})</div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-value">0</div>
+            <div class="summary-label">False Positives</div>
         </div>
     `;
 
