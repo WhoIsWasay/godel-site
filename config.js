@@ -119,34 +119,22 @@ const siteConfig = {
             short_summary: "Successfully identified a floor-division fee truncation flaw, a post-mutation interest calculation evasion, a 1-wei share-burning rounding arbitrage, and verified a false-positive unchecked overflow guard"
         },
         {
-            contract_name: "IdleYieldSource",
-            lines_of_code: 154,
-            bugs_planted: 2,
-            bugs_found: 1,
-            bugs_missed: 1,
+            contract_name: "PoolTogetherV3 (Code4rena)",
+            lines_of_code: 433,
+            bugs_planted: 4,
+            bugs_found: 2,
+            bugs_missed: 2,
             false_positives: 0,
             status: "Partial",
-            category_tags: ["logic", "competitive-audit"],
-            github_link: "https://github.com/WhoIsWasay/godel-audit-results/tree/main/IdleYieldSource",
-            short_summary: "Code4rena PoolTogether V3 competitive audit. Confirmed H-01: redeemToken passes wrong variable (shares instead of amount) to redeemIdleToken, causing incorrect redemption denomination. Forge EVM-verified."
-        },
-        {
-            contract_name: "YearnV2YieldSource",
-            lines_of_code: 279,
-            bugs_planted: 2,
-            bugs_found: 3,
-            bugs_missed: 0,
-            false_positives: 0,
-            status: "Caught",
             category_tags: ["arithmetic", "logic", "competitive-audit"],
-            github_link: "https://github.com/WhoIsWasay/godel-audit-results/tree/main/YearnV2YieldSource",
-            short_summary: "Code4rena PoolTogether V3 competitive audit. Confirmed H-02: _withdrawFromVault subtracts in wrong direction (previousBalance - currentBalance instead of currentBalance - previousBalance), causing underflow. Also found 2 additional precision-loss bugs in share conversion functions, all forge-verified."
+            github_link: "https://github.com/WhoIsWasay/godel-audit-results/tree/main/PoolTogetherV3",
+            short_summary: "Code4rena 2021-06 competitive audit across 2 yield source contracts. Matched 2 known high-severity findings (H-01: wrong variable in IdleYieldSource.redeemToken, H-02: inverted subtraction in YearnV2._withdrawFromVault). Also independently identified 2 precision-loss bugs in YearnV2 share conversion (_tokenToShares, _tokenToYShares) not in the original C4 report. Missed H-05 (IdleYieldSource zero-share minting) and M-01 (YearnV2 safeApprove DoS)."
         },
     ],
 
     // 5. CURRENT WORK
 currentWork: [
-    "Validated against real Code4rena competitive audit contracts (PoolTogether V3) — found 4 bugs across 2 yield source contracts, including 3 forge-confirmed EVM exploits.",
+    "Validated against the Code4rena 2021-06 PoolTogether V3 competitive audit — matched 2/4 known high-severity findings and independently identified 2 precision-loss bugs not in the original report.",
     "RAG-powered bug hunter with historical vulnerability pattern retrieval — connecting known exploit patterns to new code automatically.",
     "Expanding the competitive audit dataset with more Code4rena and Sherlock contest contracts to measure real-world catch rates."
 ],
