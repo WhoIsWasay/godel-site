@@ -118,13 +118,37 @@ const siteConfig = {
             github_link: "https://github.com/WhoIsWasay/godel-audit-results/tree/main/collateralizeDebtPosition",
             short_summary: "Successfully identified a floor-division fee truncation flaw, a post-mutation interest calculation evasion, a 1-wei share-burning rounding arbitrage, and verified a false-positive unchecked overflow guard"
         },
+        {
+            contract_name: "IdleYieldSource",
+            lines_of_code: 154,
+            bugs_planted: 2,
+            bugs_found: 1,
+            bugs_missed: 1,
+            false_positives: 0,
+            status: "Partial",
+            category_tags: ["logic", "competitive-audit"],
+            github_link: "https://github.com/WhoIsWasay/godel-audit-results/tree/main/IdleYieldSource",
+            short_summary: "Code4rena PoolTogether V3 competitive audit. Confirmed H-01: redeemToken passes wrong variable (shares instead of amount) to redeemIdleToken, causing incorrect redemption denomination. Forge EVM-verified."
+        },
+        {
+            contract_name: "YearnV2YieldSource",
+            lines_of_code: 279,
+            bugs_planted: 2,
+            bugs_found: 3,
+            bugs_missed: 0,
+            false_positives: 0,
+            status: "Caught",
+            category_tags: ["arithmetic", "logic", "competitive-audit"],
+            github_link: "https://github.com/WhoIsWasay/godel-audit-results/tree/main/YearnV2YieldSource",
+            short_summary: "Code4rena PoolTogether V3 competitive audit. Confirmed H-02: _withdrawFromVault subtracts in wrong direction (previousBalance - currentBalance instead of currentBalance - previousBalance), causing underflow. Also found 2 additional precision-loss bugs in share conversion functions, all forge-verified."
+        },
     ],
 
     // 5. CURRENT WORK
 currentWork: [
-    "Completing two additional audit engagements to expand the public findings dataset.",
-    "Refining the CEGIS loop and property-generation scoping to reduce false positives on real-world contracts.",
-    "Building out the benchmark suite and Gödel site as proof-of-work for accelerator applications."
+    "Validated against real Code4rena competitive audit contracts (PoolTogether V3) — found 4 bugs across 2 yield source contracts, including 3 forge-confirmed EVM exploits.",
+    "RAG-powered bug hunter with historical vulnerability pattern retrieval — connecting known exploit patterns to new code automatically.",
+    "Expanding the competitive audit dataset with more Code4rena and Sherlock contest contracts to measure real-world catch rates."
 ],
 
     // 6. KNOWN PROBLEMS
@@ -152,6 +176,6 @@ currentWork: [
     // 8. FOOTER
     footer: {
         contactEmail: "wasay.godel@gmail.com",
-        lastUpdated: "July 2026"
+        lastUpdated: "August 2026"
     }
 };
