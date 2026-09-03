@@ -119,18 +119,6 @@ const siteConfig = {
             short_summary: "Successfully identified a floor-division fee truncation flaw, a post-mutation interest calculation evasion, a 1-wei share-burning rounding arbitrage, and verified a false-positive unchecked overflow guard"
         },
         {
-            contract_name: "MiniVault",
-            lines_of_code: 72,
-            bugs_planted: 4,
-            bugs_found: 3,
-            bugs_missed: 1,
-            false_positives: 0,
-            status: "Partial", // Use: "Caught", "Missed", or "Partial"
-            category_tags: ["arithmetic", "logic"],
-            github_link: "https://github.com/WhoIsWasay/godel-audit-results/tree/main/MiniVault",
-            short_summary: "Identified 3 forge-confirmed findings: a flat-500 instead of 5% emergency-withdraw penalty (breaks 5% penalty invariant, underflows small positions), a zero-share-burn in withdraw, and orphaned assets left behind when the last shareholder emergency-withdraws. Also flagged the deposit zero-share mint on high share price."
-        },
-        {
             contract_name: "PoolTogetherV3 (Code4rena)",
             lines_of_code: 433,
             bugs_planted: 4,
@@ -146,7 +134,6 @@ const siteConfig = {
 
     // 5. CURRENT WORK
 currentWork: [
-    "Audited MiniVault, a yield-bearing staking vault — 3 forge-confirmed findings (flat-500 instead of 5% emergency-withdraw penalty, zero-share-burn in withdraw, orphaned assets on last shareholder exit) plus the deposit zero-share mint at high share price.",
     "Validated against the Code4rena 2021-06 PoolTogether V3 competitive audit — matched 2/4 known high-severity findings and independently identified 2 precision-loss bugs not in the original report.",
     "RAG-powered bug hunter with historical vulnerability pattern retrieval — connecting known exploit patterns to new code automatically.",
     "Expanding the competitive audit dataset with more Code4rena and Sherlock contest contracts to measure real-world catch rates."
@@ -177,6 +164,6 @@ currentWork: [
     // 8. FOOTER
     footer: {
         contactEmail: "wasay.godel@gmail.com",
-        lastUpdated: "September 2026"
+        lastUpdated: "August 2026"
     }
 };
