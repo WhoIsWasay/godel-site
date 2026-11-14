@@ -7,7 +7,7 @@ const siteConfig = {
     // 1. HERO SECTION
     hero: {
         projectName: "Gödel",
-        tagline: "An AI-powered formal verification agent for smart contracts.",
+        tagline: "Formal verification for multi-contract Solidity protocols — Z3 proofs, Foundry-replayed exploits.",
         founderName: "Abdul Wasay", 
         founderTagline: "CS student and solo founder building automated reasoning engines for Ethereum.",
         githubRepoUrl: "https://github.com/WhoIsWasay/godel-audit-results",
@@ -18,17 +18,18 @@ const siteConfig = {
     // 2. ABOUT SECTION
  about: {
     bio: "I'm a computer science student and solo founder building infrastructure at the intersection of AI and formal methods. Before Gödel, I built Sprout, a developer-first payment gateway with a full Go/Redis/PostgreSQL backend and a double-entry ledger, from scratch. Gödel is my attempt to bring the same rigor to smart contract security — merging large language models with deterministic mathematical provers.",
-    whyItExists: "Smart contract vulnerabilities cause billions in losses, but traditional formal verification is too slow and requires specialized PhD-level knowledge to write properties. Gödel bridges this gap. It acts as an autonomous agent that reads Solidity code, generates strict invariants, and mathematically proves them."
+    whyItExists: "Smart contract vulnerabilities cause billions in losses, but traditional formal verification is too slow and requires specialized PhD-level knowledge to write properties. Gödel bridges this gap. It reads a Solidity protocol, builds an exact model of the deployed contracts, proves declared invariants with Z3, and only reports a finding when Foundry replays a synthesized exploit. Single-function reasoning still runs, but the engine now reasons over bounded cross-contract executions too."
 },
     // 3. PIPELINE STAGES (HOW IT WORKS)
     // Renders as a left-to-right flow diagram
     pipeline: [
-  { name: "Bug Hunter", description: "Analyzes function logic to propose candidate vulnerabilities." },
-  { name: "Supervisor", description: "Critiques candidates and can trigger re-analysis." },
-  { name: "Specifier", description: "Formalizes the vulnerability into a provable invariant." },
-  { name: "Executor / Z3", description: "Symbolic execution and SMT solving to prove or disprove the invariant." },
-  { name: "Gatekeeper", description: "Verifies the exploit against a live Foundry EVM test — no proof, no bug." },
-  { name: "Fixer", description: "Proposes a patch, re-verified against the same invariant." }
+  { name: "Ingest", description: "Slither CFG + Foundry/Hardhat build-info, with a pinned solc per source pragma." },
+  { name: "Deploy Model", description: "Contracts, instances, constructor wiring, roles and declared proxies from the deployment scripts." },
+  { name: "Exact Harness", description: "Per-function and cross-contract Z3 models: checked arithmetic, mappings, structs, arrays, linked args and returns." },
+  { name: "Trace Reasoning", description: "Declared protocol, economic and return invariants over bounded multi-contract traces (BMC)." },
+  { name: "Execution Semantics", description: "Reentrancy schedules, declared transaction orders, nested ETH value and declared ERC-20 accounting." },
+  { name: "PoC Synthesis", description: "A deterministic Foundry test built from the exact counterexample; a declared proxy is reproduced through the proxy." },
+  { name: "Foundry Gate", description: "Every finding is replayed on the EVM — no replay, no bug. Z3-only violations stay inconclusive." }
 ],
 
     // 4. BENCHMARK RESULTS (THE CORE DATA)
@@ -144,39 +145,80 @@ const siteConfig = {
         },
     ],
 
-    // 5. CURRENT WORK
+    // 5. MULTI-CONTRACT ASSURANCE
+    benchmarkNote: "Historical single-contract audit results (September 2026). The multi-contract engine is summarized above and is not part of these historical catch-rate numbers.",
+    capabilities: {
+        lead: "Yes — Gödel is multi-contract now, with explicit boundaries. The engine builds a model of the deployed protocol, proves declared invariants over bounded cross-contract executions, and only confirms a finding when Foundry replays a synthesized test. It is protocol-level assurance for a declared scope, not a full-protocol audit.",
+        supported: [
+            "Multi-contract call graphs from Foundry or Hardhat builds, with constructor wiring, roles and declared proxies taken from deployment scripts (broadcast/Hardhat fallbacks).",
+            "Cross-contract linked calls bind arguments, return values and `{value: ...}`; nested links propagate ETH value to a capped depth (3) with reentrancy-aware refusals.",
+            "Declared protocol invariants and economic templates (conservation, solvency, fee cap, escrow split, lending) over bounded traces, with near-miss results labeled, never sold as safe.",
+            "Declared identical-layout proxies are resolved over the proxy's storage, and the deterministic PoC is proxy-faithful — a direct-implementation shortcut is refused.",
+            "Declared standard-ERC-20 accounting: transfer/transferFrom/approve (+ optional mint/burn), balance/allowance/overflow guards, and `Token.balances[Vault]@new`-style claims.",
+            "Reentrancy schedules with an attacker callback, declared transaction-order sensitivity, and gas/DoS detector priors with Foundry liveness PoCs.",
+            "Critical promotion is gated: exact model + bound property + attacker reachability + a confirmed deterministic PoC. No replay, no confirmed finding."
+        ],
+        notClaimed: [
+            "A full-protocol audit, or a proof over every reachable state of an arbitrary protocol.",
+            "Proxy admin/upgrade policy, undeclared storage-layout merges, or live chain/fork state.",
+            "Fee-on-transfer, rebasing, blacklists, or token behavior beyond the declared standard ERC-20 surface.",
+            "Oracles beyond the declared/mock model, or economic game-theory guarantees.",
+            "Mempool, builder or private order-flow simulation; profit maximization; gas bidding.",
+            "Formal gas or liveness proofs — gas/DoS output is a detector prior.",
+            "Non-Solidity targets (Vyper, Rust/Solana, Move, CosmWasm)."
+        ],
+        evidence: [
+            { value: "M7–M13", label: "protocol, reentrancy, economic, oracle, ordering, gas, critical" },
+            { value: "Depth 3", label: "nested linked-call cap" },
+            { value: "0", label: "confirmed findings without a Foundry replay" },
+            { value: "1,600+", label: "offline regression tests" }
+        ]
+    },
+
+    // 6. CURRENT WORK
 currentWork: [
-    "Audited MiniVault, a yield-bearing staking vault — all 4 bugs forge-confirmed: flat-500 instead of 5% emergency-withdrawal penalty, zero-share-burn in withdraw, orphaned assets on last-shareholder exit, and a non-zero deposit minting zero shares at a high share price.",
-    "Validated against the Code4rena 2021-06 PoolTogether V3 competitive audit — matched 2/4 known high-severity findings and independently identified 2 precision-loss bugs not in the original report.",
-    "RAG-powered bug hunter with historical vulnerability pattern retrieval — connecting known exploit patterns to new code automatically.",
-    "Expanding the competitive audit dataset with more Code4rena and Sherlock contest contracts to measure real-world catch rates."
+    "Multi-contract assurance (M7–M13): declared protocol and economic invariants over bounded cross-contract traces, with deterministic Foundry PoCs built from exact Z3 counterexamples.",
+    "Proxy-faithful reproduction: declared identical-layout proxies are deployed and called through the proxy; a direct-implementation PoC is refused.",
+    "Declared ERC-20 accounting: external token balances and supply are modeled with transfer/transferFrom/approve guards, plus a concrete-token PoC path.",
+    "Nested value flow: ETH value propagates through linked hops to depth 3, with under-forwarding controls and explicit depth refusals.",
+    "Release tooling: Docker runtime (godel:local), SARIF export, scorecard, one-command CLI and a ship-check release gate; the offline suite is 1,600+ tests."
 ],
 
-    // 6. KNOWN PROBLEMS
+    // 7. KNOWN PROBLEMS
  knownProblems: [
     {
-        problem: "Isolated Function Scope",
-        why_it_happens: "The Inspector-Isolator engine is rigidly constrained to analyze one isolated function at a time. It is mathematically blind to compositional, multi-transaction attack vectors. If a zero-day exploit relies on an attacker interacting with one public entrypoint (e.g., triggering a state lock) and then calling an entirely separate public entrypoint in a subsequent transaction to drain funds, the isolated pipeline will mark both functions as safe. This boundary can only be breached in a separate, compositional agent phase.",
-        planned_fix: "'None' at this stage. Our main focus is to find and fix at least 95% of the isolated bugs out there."
+        problem: "Declared scope, not arbitrary protocols",
+        why_it_happens: "Multi-contract reasoning is bounded: declared deployments, declared invariants, bounded trace depth, and at most three nested linked calls. An invariant or attack path outside that declared scope is not proven, and an unmodeled contract interaction keeps the model PARTIAL rather than being counted safe.",
+        planned_fix: "Widen the declared-trace budget and automatic trace enumeration per protocol; deepen nested-value/state linkage beyond three hops."
     },
     {
-        problem: "Unverified State Reachability",
-        why_it_happens: "When the Isolator proves an invariant violation, it proves it over free variables, not over states reachable through real transaction sequences. In many cases the violating state coincides with a genuinely reachable one, particularly when shared state can be influenced through paths outside the function under analysis. But the pipeline has no general mechanism to confirm that a mathematically valid counterexample corresponds to an actual reachable state, so a reported finding's severity — or its exploitability at all — may be overstated.",
-        planned_fix: "'None' at this stage. Both this and the isolated-scope limitation stem from the same boundary: proper resolution requires modeling the full state-transition system rather than a single function body, which is deferred to a separate, compositional agent phase."
+        problem: "Unmodeled external behavior",
+        why_it_happens: "External calls without a declaration keep the external-call havock. Fee-on-transfer, rebasing, blacklists, undeclared proxies, undeclared oracles and non-standard token functions are refused with a reason — they are never guessed. A finding that needs one of those behaviors is reported as inconclusive, not confirmed.",
+        planned_fix: "Add more declared semantics (fee-on-transfer, oracle interfaces, upgrade/admin layouts) only behind explicit README declarations and per-feature regression fixtures."
+    },
+    {
+        problem: "Economic, MEV and gas limits",
+        why_it_happens: "Transaction-order checks cover declared actor sequences only; there is no mempool, builder, private order-flow or gas-bidding simulation. Gas/DoS output is a deterministic detector prior with a Foundry liveness PoC, not a formal gas proof. Economic invariants are templates over declared ledgers, not a game-theory review.",
+        planned_fix: "Add richer declared order-flow models and bounded cost models while keeping every result reproducible and clearly labeled."
+    },
+    {
+        problem: "Reachability is modeled, not live",
+        why_it_happens: "Deterministic PoCs deploy a fresh instance from the deployment model and use the declared actor/setup. Live chain state, fork state and unscripted deployments are out of scope, so a mathematically valid counterexample that needs an unmodeled pre-state stays inconclusive.",
+        planned_fix: "Opt-in pinned-block fork pre-states and a stricter deployment-manifest coverage report."
     },
 ],
 
-    // 7. ROADMAP
+    // 8. ROADMAP
   roadmap: [
-    { phase: "Phase 1: Solidity FV Hardening", description: "Achieve a 95% catch rate on the standardized vulnerable contract dataset." },
-    { phase: "Phase 2: CI/CD Integration", description: "Develop GitHub Actions for zero-config PR verification." },
-    { phase: "Phase 3: Multi-language Support", description: "Expand the agentic pipeline to Rust/Solana and Vyper." },
+    { phase: "Phase 1: Protocol-level assurance", description: "Shipped M7–M13: cross-contract traces, protocol/economic invariants, reentrancy, ordering, gas/DoS priors and the critical promotion gate. Expanding real-world protocol coverage under declared scope." },
+    { phase: "Phase 2: Release & CI", description: "Docker runtime, one-command CLI, SARIF, scorecard, ship-check and dependency/SBOM gates are in place; hosted zero-config PR verification is next." },
+    { phase: "Phase 3: Multi-language Support", description: "Expand the agentic pipeline to Rust/Solana and Vyper after the Solidity protocol-level surface is complete." },
     { phase: "Phase 4: The FV Environment", description: "A unified development environment where formal verification is as native as autocomplete — write code, get invariants proposed and proven in real time, not bolted on after the fact." }
 ],
 
-    // 8. FOOTER
+    // 9. FOOTER
     footer: {
         contactEmail: "wasay.godel@gmail.com",
-        lastUpdated: "September 2026"
+        lastUpdated: "November 2026"
     }
 };

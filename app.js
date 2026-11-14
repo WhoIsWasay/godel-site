@@ -1,5 +1,5 @@
-/**
- * GÖDEL RENDERING ENGINE WITH ANIMATIONS
+﻿/**
+ * GÃ–DEL RENDERING ENGINE WITH ANIMATIONS
  * Reads from siteConfig and builds the DOM. 
  */
 
@@ -39,16 +39,44 @@ document.addEventListener('DOMContentLoaded', () => {
         const stepDiv = document.createElement('div');
         stepDiv.className = 'pipeline-step';
         stepDiv.innerHTML = `
-            <h3>0${index + 1} — ${step.name}</h3>
+            <h3>0${index + 1} â€” ${step.name}</h3>
             <p>${step.description}</p>
         `;
         pipelineContainer.appendChild(stepDiv);
     });
 
-    // 4. Render Benchmarks
+    // 4. Render Multi-Contract Assurance
+    const caps = siteConfig.capabilities;
+    const capsContainer = document.getElementById('capabilities-container');
+    document.getElementById('capabilities').classList.add('reveal');
+    const capList = (items) => items.map(item => `<li>${item}</li>`).join('');
+    capsContainer.innerHTML = `
+        <p class="cap-lead">${caps.lead}</p>
+        <div class="grid-2-col">
+            <div class="capability-card">
+                <h3>Modeled now</h3>
+                <ul class="tech-list">${capList(caps.supported)}</ul>
+            </div>
+            <div class="capability-card not-claimed">
+                <h3>Explicitly not claimed</h3>
+                <ul class="tech-list">${capList(caps.notClaimed)}</ul>
+            </div>
+        </div>
+        <div class="summary-grid cap-evidence">
+            ${caps.evidence.map(item => `
+                <div class="summary-card">
+                    <div class="summary-value">${item.value}</div>
+                    <div class="summary-label">${item.label}</div>
+                </div>`).join('')}
+        </div>
+    `;
+
+    // 5. Render Benchmarks
     const tableBody = document.getElementById('benchmark-tbody');
     const summaryGrid = document.getElementById('benchmark-summary');
     document.getElementById('benchmarks').classList.add('reveal');
+    document.getElementById('benchmark-note').textContent =
+        siteConfig.benchmarkNote || '';
     
     let totalContracts = siteConfig.benchmarks.length;
     let syntheticPlanted = 0;
@@ -105,7 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
     `;
 
-    // 5. Render Current Work
+    // 6. Render Current Work
     const currentWorkSection = document.getElementById('current-work');
     currentWorkSection.classList.add('reveal');
     const currentWorkList = document.getElementById('current-work-list');
@@ -115,7 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
         currentWorkList.appendChild(li);
     });
 
-    // 6. Render Roadmap
+    // 7. Render Roadmap
     const roadmapSection = document.getElementById('roadmap');
     roadmapSection.classList.add('reveal');
     const roadmapList = document.getElementById('roadmap-list');
@@ -128,7 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
         roadmapList.appendChild(li);
     });
 
-    // 7. Render Known Limitations
+    // 8. Render Known Limitations
     const limitationsSection = document.getElementById('limitations');
     limitationsSection.classList.add('reveal');
     const limitationsContainer = document.getElementById('limitations-container');
@@ -146,10 +174,10 @@ document.addEventListener('DOMContentLoaded', () => {
         limitationsContainer.appendChild(details);
     });
 
-    // 8. Render Footer
+    // 9. Render Footer
     const footer = document.getElementById('footer');
     footer.innerHTML = `
-        <div>Gödel Engine • <a href="mailto:${siteConfig.footer.contactEmail}">Contact</a></div>
+        <div>GÃ¶del Engine â€¢ <a href="mailto:${siteConfig.footer.contactEmail}">Contact</a></div>
         <div>Last Updated: ${siteConfig.footer.lastUpdated}</div>
     `;
 
