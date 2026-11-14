@@ -1,21 +1,22 @@
-﻿/**
- * GÃ–DEL RENDERING ENGINE WITH ANIMATIONS
- * Reads from siteConfig and builds the DOM. 
+/**
+ * GÖDEL RENDERING ENGINE
+ * Reads from siteConfig and builds the DOM.
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-    
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
     // 1. Render Hero
     const hero = document.getElementById('hero');
-    hero.classList.add('reveal'); // Add animation class
-    let videoHtml = siteConfig.hero.youtubeEmbedUrl 
-        ? `<div class="video-container"><iframe src="${siteConfig.hero.youtubeEmbedUrl}" frameborder="0" allowfullscreen></iframe></div>` 
+    hero.classList.add('reveal');
+    const videoHtml = siteConfig.hero.youtubeEmbedUrl
+        ? `<div class="video-container"><iframe src="${siteConfig.hero.youtubeEmbedUrl}" title="Gödel overview" frameborder="0" allowfullscreen></iframe></div>`
         : '';
-    
+
     hero.innerHTML = `
         <h1>${siteConfig.hero.projectName}</h1>
         <p class="hero-tagline">${siteConfig.hero.tagline}</p>
-        <a href="${siteConfig.hero.githubRepoUrl}" class="btn" target="_blank">View on GitHub</a>
+        <a href="${siteConfig.hero.githubRepoUrl}" class="btn" target="_blank" rel="noopener noreferrer">View on GitHub</a>
         <div class="hero-founder">
             <strong>${siteConfig.hero.founderName}</strong><br>
             ${siteConfig.hero.founderTagline}
@@ -28,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
     about.classList.add('reveal');
     about.innerHTML = `
         <h2>About</h2>
-        <p style="color: #fff; font-size: 1.1rem; margin-bottom: 1rem;">${siteConfig.about.whyItExists}</p>
+        <p class="about-lead">${siteConfig.about.whyItExists}</p>
         <p>${siteConfig.about.bio}</p>
     `;
 
@@ -39,50 +40,23 @@ document.addEventListener('DOMContentLoaded', () => {
         const stepDiv = document.createElement('div');
         stepDiv.className = 'pipeline-step';
         stepDiv.innerHTML = `
-            <h3>0${index + 1} â€” ${step.name}</h3>
+            <h3>0${index + 1} - ${step.name}</h3>
             <p>${step.description}</p>
         `;
         pipelineContainer.appendChild(stepDiv);
     });
 
-    // 4. Render Multi-Contract Assurance
-    const caps = siteConfig.capabilities;
-    const capsContainer = document.getElementById('capabilities-container');
-    document.getElementById('capabilities').classList.add('reveal');
-    const capList = (items) => items.map(item => `<li>${item}</li>`).join('');
-    capsContainer.innerHTML = `
-        <p class="cap-lead">${caps.lead}</p>
-        <div class="grid-2-col">
-            <div class="capability-card">
-                <h3>Modeled now</h3>
-                <ul class="tech-list">${capList(caps.supported)}</ul>
-            </div>
-            <div class="capability-card not-claimed">
-                <h3>Explicitly not claimed</h3>
-                <ul class="tech-list">${capList(caps.notClaimed)}</ul>
-            </div>
-        </div>
-        <div class="summary-grid cap-evidence">
-            ${caps.evidence.map(item => `
-                <div class="summary-card">
-                    <div class="summary-value">${item.value}</div>
-                    <div class="summary-label">${item.label}</div>
-                </div>`).join('')}
-        </div>
-    `;
-
-    // 5. Render Benchmarks
-    const tableBody = document.getElementById('benchmark-tbody');
+    // 4. Render Benchmarks
+    const benchmarkList = document.getElementById('benchmark-list');
     const summaryGrid = document.getElementById('benchmark-summary');
     document.getElementById('benchmarks').classList.add('reveal');
-    document.getElementById('benchmark-note').textContent =
-        siteConfig.benchmarkNote || '';
-    
-    let totalContracts = siteConfig.benchmarks.length;
+
+    const totalContracts = siteConfig.benchmarks.length;
     let syntheticPlanted = 0;
     let syntheticFound = 0;
     let competitivePlanted = 0;
     let competitiveFound = 0;
+    let totalFalsePositives = 0;
 
     siteConfig.benchmarks.forEach(bm => {
         const isCompetitive = bm.category_tags && bm.category_tags.includes('competitive-audit');
@@ -93,22 +67,30 @@ document.addEventListener('DOMContentLoaded', () => {
             syntheticPlanted += bm.bugs_planted;
             syntheticFound += bm.bugs_found;
         }
+        totalFalsePositives += bm.false_positives || 0;
 
-        const row = document.createElement('tr');
         const badgeClass = bm.status.toLowerCase();
         const tagsHtml = bm.category_tags.map(tag => `<span class="tag">${tag}</span>`).join('');
-        
-        row.innerHTML = `
-            <td data-label="Contract"><a href="${bm.github_link}" target="_blank">${bm.contract_name}</a></td>
-            <td data-label="LOC">${bm.lines_of_code}</td>
-            <td data-label="Status"><span class="badge ${badgeClass}">${bm.status}</span></td>
-            <td data-label="Bugs">${bm.bugs_found} / ${bm.bugs_planted}</td>
-            <td data-label="Missed">${bm.bugs_missed}</td>
-            <td data-label="False Pos.">${bm.false_positives}</td>
-            <td data-label="Categories">${tagsHtml}</td>
-            <td data-label="Summary" style="color: var(--text-muted);">${bm.short_summary}</td>
+
+        const card = document.createElement('article');
+        card.className = 'benchmark-card';
+        card.innerHTML = `
+            <div class="benchmark-head">
+                <a class="benchmark-name" href="${bm.github_link}" target="_blank" rel="noopener noreferrer">${bm.contract_name}</a>
+                <div class="benchmark-meta">
+                    <span class="badge ${badgeClass}">${bm.status}</span>
+                    <span>${bm.lines_of_code} LOC</span>
+                </div>
+            </div>
+            <div class="benchmark-stats">
+                <span><strong>${bm.bugs_found}/${bm.bugs_planted}</strong> bugs found</span>
+                <span><strong>${bm.bugs_missed}</strong> missed</span>
+                <span><strong>${bm.false_positives}</strong> false pos.</span>
+            </div>
+            <div class="benchmark-tags">${tagsHtml}</div>
+            <p class="benchmark-summary">${bm.short_summary}</p>
         `;
-        tableBody.appendChild(row);
+        benchmarkList.appendChild(card);
     });
 
     const syntheticHitRate = syntheticPlanted > 0 ? ((syntheticFound / syntheticPlanted) * 100).toFixed(1) : 0;
@@ -128,12 +110,12 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="summary-label">C4 Match Rate (${competitiveFound}/${competitivePlanted})</div>
         </div>
         <div class="summary-card">
-            <div class="summary-value">0</div>
+            <div class="summary-value">${totalFalsePositives}</div>
             <div class="summary-label">False Positives</div>
         </div>
     `;
 
-    // 6. Render Current Work
+    // 5. Render Current Work
     const currentWorkSection = document.getElementById('current-work');
     currentWorkSection.classList.add('reveal');
     const currentWorkList = document.getElementById('current-work-list');
@@ -143,7 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
         currentWorkList.appendChild(li);
     });
 
-    // 7. Render Roadmap
+    // 6. Render Roadmap
     const roadmapSection = document.getElementById('roadmap');
     roadmapSection.classList.add('reveal');
     const roadmapList = document.getElementById('roadmap-list');
@@ -156,7 +138,7 @@ document.addEventListener('DOMContentLoaded', () => {
         roadmapList.appendChild(li);
     });
 
-    // 8. Render Known Limitations
+    // 7. Render Known Limitations
     const limitationsSection = document.getElementById('limitations');
     limitationsSection.classList.add('reveal');
     const limitationsContainer = document.getElementById('limitations-container');
@@ -174,37 +156,42 @@ document.addEventListener('DOMContentLoaded', () => {
         limitationsContainer.appendChild(details);
     });
 
-    // 9. Render Footer
+    // 8. Render Footer
     const footer = document.getElementById('footer');
     footer.innerHTML = `
-        <div>GÃ¶del Engine â€¢ <a href="mailto:${siteConfig.footer.contactEmail}">Contact</a></div>
+        <div>Gödel Engine | <a href="mailto:${siteConfig.footer.contactEmail}">Contact</a></div>
         <div>Last Updated: ${siteConfig.footer.lastUpdated}</div>
     `;
 
     // --------------------------------------------------------
-    // INIT INTERSECTION OBSERVER FOR SCROLL ANIMATIONS
+    // SCROLL REVEAL (respects reduced-motion)
     // --------------------------------------------------------
+    if (reduceMotion) {
+        document.querySelectorAll('.reveal').forEach(section => {
+            section.classList.add('active');
+        });
+        return;
+    }
+
     const observerOptions = {
         root: null,
         rootMargin: '0px',
-        threshold: 0.15 // Triggers when 15% of the element is visible
+        threshold: 0.15
     };
 
-    const observer = new IntersectionObserver((entries, observer) => {
+    const observer = new IntersectionObserver((entries, obs) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 entry.target.classList.add('active');
-                observer.unobserve(entry.target); // Only animate once
+                obs.unobserve(entry.target);
             }
         });
     }, observerOptions);
 
-    // Grab all elements with the 'reveal' class and observe them
     document.querySelectorAll('.reveal').forEach(section => {
         observer.observe(section);
     });
-    
-    // Trigger the hero animation immediately on load
+
     setTimeout(() => {
         document.getElementById('hero').classList.add('active');
     }, 100);
